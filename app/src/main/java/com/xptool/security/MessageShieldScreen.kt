@@ -1,16 +1,12 @@
 package com.xptool.security
 
-import android.Manifest
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.text.TextUtils
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,7 +26,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -78,13 +73,8 @@ fun MessageShieldScreen(
     var isScanning by remember { mutableStateOf(false) }
     var report by remember { mutableStateOf<MessageScanReport?>(null) }
 
-    // Check permissions state
+    // Cleaned up states: Only tracking Overlay and Notification Access now
     var hasOverlayPerm by remember { mutableStateOf(Settings.canDrawOverlays(context)) }
-    var hasSmsPerm by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(context, Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED
-        )
-    }
     var isUniversalGuardActive by remember { mutableStateOf(isNotificationServiceEnabled(context)) }
 
     // Auto-update permission state when returning from Android Settings
@@ -93,17 +83,10 @@ fun MessageShieldScreen(
             if (event == Lifecycle.Event.ON_RESUME) {
                 hasOverlayPerm = Settings.canDrawOverlays(context)
                 isUniversalGuardActive = isNotificationServiceEnabled(context)
-                hasSmsPerm = ContextCompat.checkSelfPermission(context, Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
-    }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { perms ->
-        hasSmsPerm = perms[Manifest.permission.RECEIVE_SMS] == true
     }
 
     fun analyzeMessage(rawText: String) {
@@ -163,19 +146,13 @@ fun MessageShieldScreen(
         Spacer(modifier = Modifier.height(18.dp))
 
         // ==========================================
-        // 1. UNIVERSAL APP GUARD (WhatsApp / Telegram)
+        // 1. UNIVERSAL APP GUARD (WhatsApp / Telegram / SMS via Notifications)
         // ==========================================
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable {
-                    if (!isUniversalGuardActive) {
-                        // Direct hidden settings page khol dega!
-                        context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
-                    } else {
-                        // Agar off karna ho wapas settings bhej de
-                        context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
-                    }
+                    context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
                 },
             color = if (isUniversalGuardActive) XPSafe.copy(alpha = 0.12f) else XPCard,
             border = BorderStroke(1.dp, if (isUniversalGuardActive) XPSafe else XPAccent),
@@ -203,7 +180,7 @@ fun MessageShieldScreen(
                 Column {
                     Text("Universal App Guard", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold)
                     Text(
-                        text = if (isUniversalGuardActive) "Monitoring WhatsApp & Telegram" else "Tap to enable Notification Access",
+                        text = if (isUniversalGuardActive) "Monitoring Chat & SMS Apps" else "Tap to enable Notification Access",
                         color = if (isUniversalGuardActive) XPSafe else Color.Gray,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold
@@ -215,12 +192,12 @@ fun MessageShieldScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         // ==========================================
-        // 2. BACKGROUND SMS AUTO-GUARD CONTROL CARD
+        // 2. LIVE ALERT OVERLAY CONTROL CARD
         // ==========================================
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = XPCard),
-            border = BorderStroke(1.dp, if (hasOverlayPerm && hasSmsPerm) XPSafe else XPBorder),
+            border = BorderStroke(1.dp, if (hasOverlayPerm) XPSafe else XPBorder),
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
@@ -230,14 +207,14 @@ fun MessageShieldScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "SMS AUTO-GUARD",
+                        text = "LIVE OVERLAY ALERTS",
                         color = XPAccentBright,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = if (hasOverlayPerm && hasSmsPerm) "● ARMED" else "● SETUP NEEDED",
-                        color = if (hasOverlayPerm && hasSmsPerm) XPSafe else XPWarning,
+                        text = if (hasOverlayPerm) "● ARMED" else "● SETUP NEEDED",
+                        color = if (hasOverlayPerm) XPSafe else XPWarning,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -245,7 +222,7 @@ fun MessageShieldScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "High-risk SMS triggers a non-blocking floating overlay. Normal/Suspicious SMS sends a quiet notification.",
+                    text = "High-risk messages trigger a non-blocking floating overlay. Standard alerts use quiet notifications.",
                     color = Color.LightGray,
                     fontSize = 12.sp,
                     lineHeight = 17.sp
@@ -253,53 +230,24 @@ fun MessageShieldScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Row(
+                OutlinedButton(
+                    onClick = {
+                        val intent = Intent(
+                            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                            Uri.parse("package:${context.packageName}")
+                        )
+                        context.startActivity(intent)
+                    },
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    shape = RoundedCornerShape(10.dp),
+                    border = BorderStroke(1.dp, if (hasOverlayPerm) XPSafe else XPAccent)
                 ) {
-                    OutlinedButton(
-                        onClick = {
-                            val intent = Intent(
-                                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                Uri.parse("package:${context.packageName}")
-                            )
-                            context.startActivity(intent)
-                        },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(10.dp),
-                        border = BorderStroke(1.dp, if (hasOverlayPerm) XPSafe else XPAccent)
-                    ) {
-                        Text(
-                            text = if (hasOverlayPerm) "✓ Overlay ON" else "1. Allow Overlay",
-                            color = if (hasOverlayPerm) XPSafe else Color.White,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    OutlinedButton(
-                        onClick = {
-                            hasOverlayPerm = Settings.canDrawOverlays(context)
-                            val perms = mutableListOf(
-                                Manifest.permission.RECEIVE_SMS,
-                                Manifest.permission.READ_SMS
-                            )
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                perms.add(Manifest.permission.POST_NOTIFICATIONS)
-                            }
-                            permissionLauncher.launch(perms.toTypedArray())
-                        },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(10.dp),
-                        border = BorderStroke(1.dp, if (hasSmsPerm) XPSafe else XPAccent)
-                    ) {
-                        Text(
-                            text = if (hasSmsPerm) "✓ SMS Guard ON" else "2. Allow SMS",
-                            color = if (hasSmsPerm) XPSafe else Color.White,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    Text(
+                        text = if (hasOverlayPerm) "✓ Overlay Active" else "Allow Overlay Permission",
+                        color = if (hasOverlayPerm) XPSafe else Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -349,7 +297,7 @@ fun MessageShieldScreen(
             placeholder = {
                 Text("Dear customer, your SBI account will be blocked today. Update PAN immediately at bit.ly/...")
             },
-            label = { Text("Paste SMS / WhatsApp Message") },
+            label = { Text("Paste Text / WhatsApp Message") },
             shape = RoundedCornerShape(14.dp)
         )
 

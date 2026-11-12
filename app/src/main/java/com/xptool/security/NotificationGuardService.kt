@@ -17,8 +17,12 @@ class NotificationGuardService : NotificationListenerService() {
         "com.whatsapp" to "WhatsApp",
         "com.whatsapp.w4b" to "WhatsApp Business",
         "org.telegram.messenger" to "Telegram",
-        "com.instagram.android" to "Instagram"
+        "com.instagram.android" to "Instagram",
+        // Naye SMS Interceptors (Bina SMS Permission ke!)
+        "com.google.android.apps.messaging" to "Google Messages",
+        "com.samsung.android.messaging" to "Samsung Messages"
     )
+
 
     private var lastProcessedSignature = ""
 
