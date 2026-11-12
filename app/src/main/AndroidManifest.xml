@@ -24,6 +24,15 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+                        <!-- System-Wide Web Shield Link Interceptor -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+            </intent-filter>
+
 
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -53,8 +62,17 @@
             </intent-filter>
         </service>
         <service
+            android:name=".NotificationGuardService"
+            android:label="XPTool Universal Guard"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <service
             android:name=".OverlayAlertService"
             android:exported="false" />
-
     </application>
 </manifest>

@@ -85,6 +85,15 @@ object LookSafeEngine {
     }
 
     fun analyze(initialUrl: NormalizedUrl, finalUrl: NormalizedUrl, redirectChain: List<String>): Pair<String, List<String>> {
+        val hostLower = finalUrl.host.lowercase()
+        if (ThreatIntelStore.blacklistedDomains.any { hostLower == it || hostLower.endsWith(".$it") }) {
+            ThreatIntelStore.scamsBlocked++
+            return "MALICIOUS (CUSTOM BLOCKLIST)" to listOf("Blocked by your custom Threat Intel firewall rule (${finalUrl.host}).")
+        }
+        if (ThreatIntelStore.whitelistedDomains.any { hostLower == it || hostLower.endsWith(".$it") }) {
+            return "SAFE (CUSTOM WHITELIST)" to listOf("Trusted via your custom Threat Intel whitelist (${finalUrl.host}).")
+        }
+
         val host = finalUrl.host.lowercase().trim()
         val parts = host.split(".")
         val tld = parts.lastOrNull() ?: ""

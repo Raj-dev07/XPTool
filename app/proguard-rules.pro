@@ -19,3 +19,16 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+# Keep CameraX & ML Kit Barcode / QR Scanner classes from R8 stripping
+-keep class androidx.camera.** { *; }
+-keepclassmembers class androidx.camera.** { *; }
+-keep interface androidx.camera.** { *; }
+
+-keep class com.google.mlkit.** { *; }
+-keep class com.google.android.gms.** { *; }
+-keep class com.google.zxing.** { *; }
+
+# Keep XPTool models & services intact
+-keep class com.xptool.security.** { *; }
+-dontwarn com.google.mlkit.**
+-dontwarn androidx.camera.**

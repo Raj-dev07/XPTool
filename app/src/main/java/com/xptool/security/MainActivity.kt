@@ -1,10 +1,13 @@
 package com.xptool.security
 
 import android.content.Intent
+import android.graphics.Color as AndroidColor
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -12,6 +15,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.core.view.WindowCompat
 
 class MainActivity : ComponentActivity() {
 
@@ -19,7 +23,18 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Makes Status Bar & Bottom Navigation Bar 100% Transparent/Black
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.statusBarColor = AndroidColor.TRANSPARENT
+        window.navigationBarColor = AndroidColor.TRANSPARENT
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            isAppearanceLightStatusBars = false
+            isAppearanceLightNavigationBars = false
+        }
+
         handleIncomingShare(intent)
+        ThreatIntelStore.init(applicationContext)
 
         setContent {
             MaterialTheme(
@@ -51,6 +66,11 @@ class MainActivity : ComponentActivity() {
             if (!sharedText.isNullOrBlank()) {
                 sharedTextState = LookSafeEngine.extractUrlFromText(sharedText)
             }
+        } else if (intent?.action == Intent.ACTION_VIEW) {
+            val clickedUrl = intent.dataString
+            if (!clickedUrl.isNullOrBlank()) {
+                sharedTextState = clickedUrl
+            }
         }
     }
 }
@@ -74,32 +94,43 @@ fun XPToolApp(
     }
 
     Surface(modifier = Modifier.fillMaxSize(), color = XPBackground) {
-        when (currentScreen) {
-            "HUB" -> DashboardHubScreen(
-                selectedLockedModule = selectedLockedModule,
-                onModuleClick = { module ->
-                    if (module.isReady) {
-                        selectedLockedModule = null
-                        currentScreen = module.id
-                    } else {
-                        selectedLockedModule = module.title
+        Crossfade(
+            targetState = currentScreen,
+            animationSpec = tween(durationMillis = 250)
+        ) { screen ->
+            when (screen) {
+                "HUB" -> DashboardHubScreen(
+                    selectedLockedModule = selectedLockedModule,
+                    onModuleClick = { module ->
+                        if (module.isReady) {
+                            selectedLockedModule = null
+                            currentScreen = module.id
+                        } else {
+                            selectedLockedModule = module.title
+                        }
                     }
-                }
-            )
-            "link" -> LinkShieldScreen(
-                incomingSharedText = incomingSharedText,
-                onShareConsumed = onShareConsumed,
-                onBackToHub = { currentScreen = "HUB" }
-            )
-            "qr" -> QrShieldScreen(
-                onBackToHub = { currentScreen = "HUB" }
-            )
-            "msg" -> MessageShieldScreen(
-                onBackToHub = { currentScreen = "HUB" }
-            )
-            "num" -> NumberShieldScreen(
-                onBackToHub = { currentScreen = "HUB" }
-            )
+                )
+                "link" -> LinkShieldScreen(
+                    incomingSharedText = incomingSharedText,
+                    onShareConsumed = onShareConsumed,
+                    onBackToHub = { currentScreen = "HUB" }
+                )
+                "qr" -> QrShieldScreen(
+                    onBackToHub = { currentScreen = "HUB" }
+                )
+                "msg" -> MessageShieldScreen(
+                    onBackToHub = { currentScreen = "HUB" }
+                )
+                "num" -> NumberShieldScreen(
+                    onBackToHub = { currentScreen = "HUB" }
+                )
+                "web" -> WebShieldScreen(
+                    onBackToHub = { currentScreen = "HUB" }
+                )
+                "intel" -> ThreatIntelScreen(
+                    onBackToHub = { currentScreen = "HUB" }
+                )
+            }
         }
     }
 }

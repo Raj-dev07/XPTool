@@ -65,6 +65,7 @@ android {
 
     buildTypes {
         release {
+            isCrunchPngs = false
             if (hasValidSigningProps) {
                 signingConfig = signingConfigs.getByName("release")
             }

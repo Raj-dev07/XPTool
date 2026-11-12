@@ -1,11 +1,14 @@
 package com.xptool.security
 
 import android.Manifest
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.text.TextUtils
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
@@ -15,6 +18,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,12 +31,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import com.xptool.security.core.url.UrlNormalizer
 import com.xptool.security.core.url.UrlResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.min
+
+fun isNotificationServiceEnabled(context: Context): Boolean {
+    val pkgName = context.packageName
+    val flat = Settings.Secure.getString(context.contentResolver, "enabled_notification_listeners")
+    if (!TextUtils.isEmpty(flat)) {
+        val names = flat.split(":")
+        for (name in names) {
+            val cn = ComponentName.unflattenFromString(name)
+            if (cn != null && TextUtils.equals(pkgName, cn.packageName)) {
+                return true
+            }
+        }
+    }
+    return false
+}
 
 data class MessageScanReport(
     val riskScore: Int,
@@ -49,6 +72,7 @@ fun MessageShieldScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     var messageText by remember { mutableStateOf("") }
     var isScanning by remember { mutableStateOf(false) }
@@ -60,6 +84,20 @@ fun MessageShieldScreen(
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED
         )
+    }
+    var isUniversalGuardActive by remember { mutableStateOf(isNotificationServiceEnabled(context)) }
+
+    // Auto-update permission state when returning from Android Settings
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                hasOverlayPerm = Settings.canDrawOverlays(context)
+                isUniversalGuardActive = isNotificationServiceEnabled(context)
+                hasSmsPerm = ContextCompat.checkSelfPermission(context, Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -117,18 +155,72 @@ fun MessageShieldScreen(
         Text("Message Shield", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
         Spacer(modifier = Modifier.height(6.dp))
         Text(
-            text = "Real-time background SMS interceptor & manual scam message analyzer.",
+            text = "Real-time background interceptor & manual scam message analyzer.",
             color = Color.LightGray,
             fontSize = 14.sp
         )
 
         Spacer(modifier = Modifier.height(18.dp))
 
-        // BACKGROUND AUTO-GUARD CONTROL CARD
+        // ==========================================
+        // 1. UNIVERSAL APP GUARD (WhatsApp / Telegram)
+        // ==========================================
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {
+                    if (!isUniversalGuardActive) {
+                        // Direct hidden settings page khol dega!
+                        context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                    } else {
+                        // Agar off karna ho wapas settings bhej de
+                        context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                    }
+                },
+            color = if (isUniversalGuardActive) XPSafe.copy(alpha = 0.12f) else XPCard,
+            border = BorderStroke(1.dp, if (isUniversalGuardActive) XPSafe else XPAccent),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(if (isUniversalGuardActive) XPSafe.copy(alpha = 0.2f) else XPAccent.copy(alpha = 0.2f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Security,
+                        contentDescription = null,
+                        tint = if (isUniversalGuardActive) XPSafe else XPAccentBright,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(14.dp))
+                Column {
+                    Text("Universal App Guard", color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.ExtraBold)
+                    Text(
+                        text = if (isUniversalGuardActive) "Monitoring WhatsApp & Telegram" else "Tap to enable Notification Access",
+                        color = if (isUniversalGuardActive) XPSafe else Color.Gray,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // ==========================================
+        // 2. BACKGROUND SMS AUTO-GUARD CONTROL CARD
+        // ==========================================
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = XPCard),
-            border = BorderStroke(1.dp, if (hasOverlayPerm && hasSmsPerm) XPSafe else XPAccent),
+            border = BorderStroke(1.dp, if (hasOverlayPerm && hasSmsPerm) XPSafe else XPBorder),
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
@@ -138,7 +230,7 @@ fun MessageShieldScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "BACKGROUND AUTO-GUARD",
+                        text = "SMS AUTO-GUARD",
                         color = XPAccentBright,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
@@ -165,7 +257,6 @@ fun MessageShieldScreen(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // 1. Overlay Permission Button
                     OutlinedButton(
                         onClick = {
                             val intent = Intent(
@@ -186,7 +277,6 @@ fun MessageShieldScreen(
                         )
                     }
 
-                    // 2. SMS + Notification Permission Button
                     OutlinedButton(
                         onClick = {
                             hasOverlayPerm = Settings.canDrawOverlays(context)
@@ -214,7 +304,6 @@ fun MessageShieldScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Live Simulator Button to test Overlay & Notification anytime!
                 Button(
                     onClick = {
                         hasOverlayPerm = Settings.canDrawOverlays(context)
@@ -248,7 +337,9 @@ fun MessageShieldScreen(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Multi-line Message Box
+        // ==========================================
+        // 3. MANUAL SCANNER
+        // ==========================================
         OutlinedTextField(
             value = messageText,
             onValueChange = { messageText = it },
@@ -300,7 +391,9 @@ fun MessageShieldScreen(
 
         Spacer(modifier = Modifier.height(22.dp))
 
-        // Report Card
+        // ==========================================
+        // 4. REPORT CARD
+        // ==========================================
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = XPCard),
@@ -425,10 +518,10 @@ fun MessageShieldScreen(
                 }
             }
         }
+        Spacer(modifier = Modifier.height(40.dp))
     }
 }
 
-// Accessible across package so SmsGuardReceiver can call it directly!
 fun runMessageHeuristics(rawText: String): MessageScanReport {
     val lower = rawText.lowercase()
     var score = 0

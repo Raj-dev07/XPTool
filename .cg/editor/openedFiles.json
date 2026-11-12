@@ -1,0 +1,351 @@
+{
+  "allFiles": [
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/src/main/java/com/xptool/security/MainActivity.kt",
+      "selection": {
+        "end": {
+          "column": 49,
+          "index": 1434,
+          "line": 36
+        },
+        "start": {
+          "column": 49,
+          "index": 1434,
+          "line": 36
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/settings.gradle.kts",
+      "selection": {
+        "end": {
+          "column": 20,
+          "index": 362,
+          "line": 22
+        },
+        "start": {
+          "column": 20,
+          "index": 362,
+          "line": 22
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/core/url/build.gradle.kts",
+      "selection": {
+        "end": {
+          "column": 1,
+          "index": 186,
+          "line": 9
+        },
+        "start": {
+          "column": 1,
+          "index": 186,
+          "line": 9
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/build.gradle.kts",
+      "selection": {
+        "end": {
+          "column": 32,
+          "index": 1700,
+          "line": 67
+        },
+        "start": {
+          "column": 32,
+          "index": 1700,
+          "line": 67
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/core/url/src/main/java/com/xptool/security/core/url/UrlResult.kt",
+      "selection": {
+        "end": {
+          "column": 1,
+          "index": 212,
+          "line": 11
+        },
+        "start": {
+          "column": 1,
+          "index": 212,
+          "line": 11
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/core/url/src/main/java/com/xptool/security/core/url/NormalizedUrl.kt",
+      "selection": {
+        "end": {
+          "column": 1,
+          "index": 206,
+          "line": 9
+        },
+        "start": {
+          "column": 1,
+          "index": 206,
+          "line": 9
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/core/url/src/test/java/com/xptool/security/core/url/UrlNormalizerTest.kt",
+      "selection": {
+        "end": {
+          "column": 1,
+          "index": 1261,
+          "line": 63
+        },
+        "start": {
+          "column": 1,
+          "index": 1261,
+          "line": 63
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/core/url/src/main/java/com/xptool/security/core/url/UrlNormalizer.kt",
+      "selection": {
+        "end": {
+          "column": 0,
+          "index": 6248,
+          "line": 160
+        },
+        "start": {
+          "column": 0,
+          "index": 6248,
+          "line": 160
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/src/main/AndroidManifest.xml",
+      "selection": {
+        "end": {
+          "column": 39,
+          "index": 3239,
+          "line": 75
+        },
+        "start": {
+          "column": 39,
+          "index": 3239,
+          "line": 75
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/src/main/java/com/xptool/security/XPTheme.kt",
+      "selection": {
+        "end": {
+          "column": 0,
+          "index": 801,
+          "line": 32
+        },
+        "start": {
+          "column": 0,
+          "index": 801,
+          "line": 32
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/src/main/java/com/xptool/security/LookSafeEngine.kt",
+      "selection": {
+        "end": {
+          "column": 8,
+          "index": 3377,
+          "line": 87
+        },
+        "start": {
+          "column": 8,
+          "index": 3377,
+          "line": 87
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/src/main/java/com/xptool/security/DashboardScreen.kt",
+      "selection": {
+        "end": {
+          "column": 35,
+          "index": 14143,
+          "line": 346
+        },
+        "start": {
+          "column": 35,
+          "index": 14143,
+          "line": 346
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/src/main/java/com/xptool/security/LinkShieldScreen.kt",
+      "selection": {
+        "end": {
+          "column": 26,
+          "index": 4471,
+          "line": 113
+        },
+        "start": {
+          "column": 26,
+          "index": 4471,
+          "line": 113
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/src/main/java/com/xptool/security/QrShieldScreen.kt",
+      "selection": {
+        "end": {
+          "column": 39,
+          "index": 6285,
+          "line": 173
+        },
+        "start": {
+          "column": 39,
+          "index": 6285,
+          "line": 173
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/src/main/java/com/xptool/security/MessageShieldScreen.kt",
+      "selection": {
+        "end": {
+          "column": 55,
+          "index": 1454,
+          "line": 35
+        },
+        "start": {
+          "column": 55,
+          "index": 1454,
+          "line": 35
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/src/main/java/com/xptool/security/SmsOverlaySystem.kt",
+      "selection": {
+        "end": {
+          "column": 1,
+          "index": 9858,
+          "line": 268
+        },
+        "start": {
+          "column": 1,
+          "index": 9858,
+          "line": 268
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/src/main/java/com/xptool/security/NumberShieldScreeningService.kt",
+      "selection": {
+        "end": {
+          "column": 36,
+          "index": 1648,
+          "line": 36
+        },
+        "start": {
+          "column": 36,
+          "index": 1648,
+          "line": 36
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/src/main/java/com/xptool/security/NumberShieldScreen.kt",
+      "selection": {
+        "end": {
+          "column": 0,
+          "index": 3182,
+          "line": 87
+        },
+        "start": {
+          "column": 0,
+          "index": 3182,
+          "line": 87
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/src/main/java/com/xptool/security/WebShieldScreen.kt",
+      "selection": {
+        "end": {
+          "column": 0,
+          "index": 41485,
+          "line": 903
+        },
+        "start": {
+          "column": 0,
+          "index": 41485,
+          "line": 903
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/src/main/java/com/xptool/security/ThreatIntelScreen.kt",
+      "selection": {
+        "end": {
+          "column": 0,
+          "index": 8677,
+          "line": 242
+        },
+        "start": {
+          "column": 0,
+          "index": 8677,
+          "line": 242
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/src/main/java/com/xptool/security/NotificationGuardService.kt",
+      "selection": {
+        "end": {
+          "column": 0,
+          "index": 3174,
+          "line": 79
+        },
+        "start": {
+          "column": 0,
+          "index": 3174,
+          "line": 79
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/build.gradle.kts",
+      "selection": {
+        "end": {
+          "column": 0,
+          "index": 0,
+          "line": 0
+        },
+        "start": {
+          "column": 0,
+          "index": 0,
+          "line": 0
+        }
+      }
+    },
+    {
+      "file": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/proguard-rules.pro",
+      "selection": {
+        "end": {
+          "column": 28,
+          "index": 1216,
+          "line": 33
+        },
+        "start": {
+          "column": 28,
+          "index": 1216,
+          "line": 33
+        }
+      }
+    }
+  ],
+  "projectPath": "/storage/emulated/0/CodeOnTheGoProjects/XPTool",
+  "selectedFile": "/storage/emulated/0/CodeOnTheGoProjects/XPTool/app/proguard-rules.pro"
+}
